@@ -151,7 +151,7 @@ public final class TransactionMgr {
     /**
      * returns true if the engine is operational. 
      */
-    boolean isUp() {
+    public boolean isUp() {
         if (state > DOWN)
             return true;
         else
