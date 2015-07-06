@@ -280,13 +280,10 @@ public final class TransactionMgr {
                 transactionBlocks.remove(tx);
             }
 
-            ArrayList<?> rb = revTransactionBlocks.get(tx);
+            ArrayList<Transaction> rb = revTransactionBlocks.get(tx);
 
             if (rb != null) {
-                Iterator<?> it = rb.iterator();
-
-                while (it.hasNext()) {
-                    Transaction t = (Transaction) it.next();
+                for (Transaction t : rb) {
 
                     // Psychotic case - a rollback may have destroyed
                     // the block by tx, and a new block for t may have
@@ -327,29 +324,23 @@ public final class TransactionMgr {
         System.out.println ("\t---Blocks---");
 
         synchronized (blockLock) {
-            Transaction tmp;
-            for (Iterator<Transaction> i = transactionBlocks.keySet().iterator();
-                 i.hasNext();) {
-                    tmp = i.next();
+            for (Transaction tmp : transactionBlocks.keySet()) {
                     System.out.println ("\t" + tmp + " blocked by  " + transactionBlocks.get(tmp));
             }
             System.out.println ("\t---Blocks---");
             System.out.println ("\t---Reverse Blocks---");
-            for (Iterator<Transaction> i = revTransactionBlocks.keySet().iterator();
-                 i.hasNext();) {
-                    tmp = i.next();
+
+            for (Transaction tmp : revTransactionBlocks.keySet()) {
+
                     System.out.print ("\t" + tmp + " blocks ");
-                    for (Iterator<?> j = revTransactionBlocks.get(tmp).iterator();
-                         j.hasNext();) {
-                         System.out.print (" " + j.next());
+                    for (Transaction j : revTransactionBlocks.get(tmp)) {
+                         System.out.print (" " + j);
                     }
                     System.out.println();
             }
         }
         System.out.println ("\t---Reverse Blocks---");
         System.out.println ("---End of Block report---");
-
-
     }
 
     /**

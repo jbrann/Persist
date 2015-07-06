@@ -83,10 +83,9 @@ class Transaction {
         }
             
         if (mustRollBack) {
-            for (Iterator<Persistent> i = persistents.values().iterator();
-                 i.hasNext();) {
+            for (Persistent p : persistents.values()) {
                 
-                i.next().rollBack(this);
+                p.rollBack(this);
             }
             synchronized (this) {
                 notifyAll();
@@ -107,8 +106,6 @@ class Transaction {
     
     void commit() throws PersistException {
         
-        Iterator<Persistent> i;
-        Persistent wk;
         PersistentLogEntry wkDI;
         toLibrary.clear();
         
@@ -119,10 +116,8 @@ class Transaction {
             @SuppressWarnings("unused")
 			long TimeStamp = System.currentTimeMillis();
             
-            for (i = persistents.values().iterator();
-                 i.hasNext();) {
+            for (Persistent wk : persistents.values()) {
                 
-                wk = i.next();
                 wkDI = null;
                 
                 if (!(wk.commitPhase1(this)) ||
@@ -143,10 +138,8 @@ class Transaction {
             
             committed = true;
             // complete out the updates
-            for (i = persistents.values().iterator();
-                 i.hasNext();) {
+            for (Persistent wk : persistents.values()) {
             
-                wk = i.next();
                 wk.commitPhase2(this);
             }
         
