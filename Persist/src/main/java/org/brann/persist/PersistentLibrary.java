@@ -105,7 +105,8 @@ class PersistentLibrary {
         if (rebuild) {
             try {
                 fis = new FileInputStream(lib);
-                iis = new InflaterInputStream(fis);
+                bis = new BufferedInputStream(fis);
+                iis = new InflaterInputStream(bis);
                 ois = new ObjectInputStream (iis);
                 classLibrary = (HashMap<Class<?>, Map<String, Persistent>>)ois.readObject();
             } catch (IOException ioe) {
@@ -159,7 +160,6 @@ class PersistentLibrary {
                 poZip.flush();
                 poFD.sync();
                 lock.release();
-                lock = null;
                 poFile.close();
                 
                 lock.close();

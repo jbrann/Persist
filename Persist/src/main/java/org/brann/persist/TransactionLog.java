@@ -153,27 +153,6 @@ class TransactionLog {
 				System.err.println("Close problem: " + ioe);
 			}
 		}
-		if (logFileBuffered != null) {
-			try {
-				logFileBuffered.close();
-			} catch (IOException ioe) {
-				System.err.println("Close problem: " + ioe);
-			}
-		}
-		if (logFileWrite != null) {
-			try {
-				logFileWrite.close();
-			} catch (IOException ioe) {
-				System.err.println("Close problem: " + ioe);
-			}
-		}
-		if (logFile != null) {
-			try {
-				logFile.close();
-			} catch (IOException ioe) {
-				System.err.println("Close problem: " + ioe);
-			}
-		}
 	}
 
 	/**
