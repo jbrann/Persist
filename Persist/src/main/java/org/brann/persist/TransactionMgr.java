@@ -172,9 +172,14 @@ public final class TransactionMgr {
     }
 
     /**
-     * Adjust the frequency of hard-synchronizing data to disk.  The argument represents the number of commit() calls completed for each forced sync() to disk.  A value of 1 synchronizes every commit().  Any value less than 1 is treated as 1.
-     * A SyncFrequency rate higher than one risks loss of committed transactions in some types of crash.  The maximum loss is 50% chance of one transaction for a Sync Frequency of 2, 33% chance of losing 1 transaction and 33% chance of losing 2 transactions for a Sync Frequency of 3, and so on.
-     * The default Sync Frequency is 1. 
+     * Adjust the frequency of hard-synchronizing data to disk.  The argument represents the number of commit() calls completed for each forced sync() to disk.  
+     * A value of 1 synchronizes every commit().  Any value less than 1 is treated as 1.
+     * A SyncFrequency rate higher than one risks loss of committed transactions in some types of crash.  
+     * The maximum loss is 50% chance of one transaction for a Sync Frequency of 2, 
+     * 33% chance of losing 1 transaction and 33% chance of losing 2 transactions for a Sync Frequency of 3, and so on.
+     * The default Sync Frequency is 1 (which guarantees no loss, as long as your disk survives...). 
+     * 
+     * 
      */
     public void setSyncFrequency(int frequency) {
         syncFrequency = frequency;

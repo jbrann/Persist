@@ -137,7 +137,10 @@ class Transaction {
         if (!killed && logger.logCommit(this)) {
             
             committed = true;
-            // complete out the updates
+            // at this point the transaction is committed and fully logged.  
+            // A restart or recovery from disk will include it.
+            // The persistent Objects in memory need all to be updated to reflect the commit
+            
             for (Persistent wk : persistents.values()) {
             
                 wk.commitPhase2(this);

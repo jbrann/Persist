@@ -36,7 +36,24 @@
 package org.brann.persist;
 
 /**
+ * This Interface can be used by clients on the classes they wish to manage persistently.
+ * It indicates that an accurate (deep) copy of an object of this class WILL NOT be made for
+ * these objects.
+ * 
+ * When this interface is referenced on the class of an object being made persistent, an 
+ * object reference will be kept, rather than making a deep copy (by serialization/deserialization)
  *
+ * This means that the integrity of the object contents are not guaranteed - the object state at 
+ * TransactionHandle.commit() time may have been changed since the last TransactionHandle.setPstValue().
+ * TransactionHandle.rollback() is not effective.
+ * 
+ * This technique is useful for immutable objects that an application guarantees are not changed after SetPstValue().
+ * an example might be a log record.
+ * 
+ * Note that UnsafeObjects must still be serializable so they can be stored and recovered.
+ * 
+ * This provides extremely high performance, with the loss of all of the transaction guarantees of the Persistence system.
+ * 
  * @author  jbrann
  */
 public interface UnsafeObject extends java.io.Serializable {

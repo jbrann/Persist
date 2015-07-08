@@ -36,7 +36,14 @@
 package org.brann.persist;
 
 /**
- *
+ * This Interface can be used by clients on the classes they wish to manage persistently.
+ * It indicates that an accurate (deep) copy of an object of this class can be made by 
+ * use of the "clone()" operation.
+ * 
+ * When this interface is referenced on the class of an object being made persistent, the 
+ * clone() method will be used (rather than serialization / deserialization) to copy the object.
+ * This may offer performance advantages.
+ * 
  * @author  jbrann
  */
 public interface SafeToClone extends Cloneable, java.io.Serializable {
