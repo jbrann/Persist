@@ -1,0 +1,379 @@
+openapi: "3.0.0"
+info:
+  version: 0.0.0
+  title: Nimble File Service
+  license:
+    name: Freddie Mac proprietary
+security:
+  - basicAuth: []
+paths:
+  /scan:
+    get:
+      summary: list directory contents
+      operationId: scan
+      parameters:
+        - name: path
+          in: query
+          description: The relative path to scan for contents IF not provided, the FILE_SERVICE_ROOT is scanned
+          required: false
+          schema:
+            type: string
+            format: relative path name
+        - name: lastModified
+          in: query
+          description: The date and time of the oldest item to be returned
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: excludeDirs
+          in: query
+          description: Whether non-file items should be returned
+          required: false
+          schema:
+            type: boolean            
+      responses:
+        200:
+          description: an array of directory content items
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/Paths"
+        403:
+          description: various identity errors (no ID provided, bad credentials, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: Authorization error.  Either the user does not have the entitlement to call the service or the service lacks filesystem permissions for the operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: path error - the relative path specified does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        503:
+          description: server error
+          content:
+            text/plain:
+              schema:
+                type: string
+  /read:
+    get:
+      summary: read the content of a file
+      operationId: read
+      parameters:
+        - name: path
+          in: query
+          description: The relative path of the file to read
+          required: true
+          schema:
+            type: string
+            format: path name
+      responses:
+        200:
+          description: The content of the specified file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileContent"
+        403:
+          description: various identity errors (no ID provided, bad credentials, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: Authorization error.  Either the user does not have the entitlement to call the service or the service lacks filesystem permissions for the operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        503:
+          description: server error
+          content:
+            text/plain:
+              schema:
+                type: string
+  /write:
+    put:
+      summary: write out a file
+      operationId: write       
+      requestBody:
+          required: true
+          description: The file and content to be written 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WriteArgs"           
+      responses:
+        200:
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        400:
+          description: File already exists and overWrite was set to false
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: various identity errors (no ID provided, bad credentials, etc.) or file exists and overWrite was set to false
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: Authorization error.  Either the user does not have the entitlement to call the service or the service lacks filesystem permissions for the operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        503:
+          description: server error
+          content:
+            text/plain:
+              schema:
+                type: string
+  /delete:
+    delete:
+      summary: delete a file
+      operationId: delete
+      parameters:
+        - name: path
+          in: query
+          description: The relative path of the file to be deleted
+          required: true
+          schema:
+            type: string
+            format: path name
+      responses:
+        200:
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        403:
+          description: various identity errors (no ID provided, bad credentials, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: Authorization error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        400:
+          description: Specified path either does not exist or is not a file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal error - failed delete for some reason
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"    
+        503:
+          description: server error
+          content:
+            text/plain:
+              schema:
+                type: string
+  /copy:
+    post:
+      summary: copy a file to a new path
+      operationId: copy
+      parameters:
+        - name: fromPath
+          in: query
+          description: The relative path of the source file to be copied
+          required: true
+          schema:
+            type: string
+            format: path name
+        - name: toPath
+          in: query
+          description: The relative path of the target file of the copy
+          required: true
+          schema:
+            type: string
+            format: path name
+        - name: overWrite
+          in: query
+          description: Whether the target file should be over-written, if it exists
+          required: false
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        403:
+          description: various identity errors (no ID provided, bad credentials, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: Authorization error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        400:
+          description: Arguments do not make sense - either source does not exist, is not a file, or is not readable or target exists and overWrite was false
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal error - failed copy for some reason
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"    
+        503:
+          description: server error
+          content:
+            text/plain:
+              schema:
+                type: string
+  /move:
+    post:
+      summary: move a file to a new path, atomically
+      operationId: move
+      parameters:
+        - name: fromPath
+          in: query
+          description: The relative path of the source file to be moved
+          required: true
+          schema:
+            type: string
+            format: path name
+        - name: toPath
+          in: query
+          description: The relative path of the target file of the move
+          required: true
+          schema:
+            type: string
+            format: path name
+        - name: overWrite
+          in: query
+          description: Whether the target file should be over-written, if it exists
+          required: false
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        403:
+          description: various identity errors (no ID provided, bad credentials, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: Authorization error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        400:
+          description: Arguments do not make sense - either source does not exist, is not a file, or is not readable or target exists and overWrite was false
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal error - failed move for some reason
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"    
+        503:
+          description: server error
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    FileContent:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          format: file content in Base64
+    PathBean:
+      type: object
+      required:
+        - fullPath
+        - isFile
+        - lastModified
+      properties:
+        fullPath:
+          type: string
+          format: path name
+        isFile:
+          type: boolean
+        lastModified:
+          type: string
+          format: date-time
+    WriteArgs:
+      type: object
+      required:
+        - path
+        - overWrite
+        - content
+      properties:
+        path:
+          type: string
+          format: relative path name of the file to be written
+        overWrite:
+          type: boolean
+        content:
+          type: string
+          format: file content in Base64
+    Paths:
+      type: array
+      items:
+        $ref: "#/components/schemas/PathBean"
+    Error:
+      type: object
+      required:
+        - Error
+      properties:
+        message:
+          type: string
+    Success:
+      type: object
+      required:
+        - Success
+      properties:
+        message:
+          type: string
