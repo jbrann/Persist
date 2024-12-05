@@ -90,9 +90,9 @@ public class PstTestBedNewAPI {
 			
 			for (si = 0, ti = threadCount - 1; ti >= 0; --ti) {
 
-				one = nextSi(si);
-				two = nextSi(one);
-				three = nextSi(two);
+				one = nextSi(threadCount, si);
+				two = nextSi(threadCount, one);
+				three = nextSi(threadCount, two);
 
 				si = three;
 
@@ -124,15 +124,15 @@ public class PstTestBedNewAPI {
 		return true;
 	}
 
-	private static int nextSi(int si) {
+	private static int nextSi(int threadCount, int si) {
 
-		if (count % 3 == 0) {
-			if (si >= (count - 2))
+		if (threadCount % 3 == 0) {
+			if (si >= (threadCount - 2))
 				si = 0;
 			else
 				++si;
 		} else {
-			if (si >= (count - 1))
+			if (si >= (threadCount - 1))
 				si = 0;
 			else
 				++si;
