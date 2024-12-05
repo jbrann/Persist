@@ -12,6 +12,12 @@ public class PstTestBedNewAPI {
 	final static int MAXACTORS = 30;
 
 	static int count;
+	static ActorNewAPI[] aa;
+	static Thread[] ta;
+	static String[] sa = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
+				"l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w",
+				"x", "y", "z", "0", "1", "2", "3" };
+
 
 	/**
 	 * Constructor.
@@ -21,20 +27,14 @@ public class PstTestBedNewAPI {
 
 	public static void main(String args[]) {
 
-		ActorNewAPI[] aa;
-		Thread[] ta;
-
 		PstTestBedNewAPI x;
 
-		int si, ti, one, two, three;
+		int syncFreq=0;
+		boolean cold = false;
 
-		String[] sa = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
-				"l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w",
-				"x", "y", "z", "0", "1", "2", "3" };
+		
 
-		TransactionMgr tMgr = TransactionMgr.getInstance();
-
-		x = new PstTestBedNewAPI();
+//		x = new PstTestBedNewAPI();
 
 		if (args.length > 0)
 			count = Integer.parseInt(args[0]);
@@ -44,32 +44,51 @@ public class PstTestBedNewAPI {
 		else if (count > MAXACTORS)
 			count = MAXACTORS;
 
-
-		if (args.length > 2) {
-			try {
-				tMgr.setSyncFrequency(Integer.parseInt(args[2]));
-			} catch (NumberFormatException nfe) {
+		if (args.length > 1) {
+			if (args[1].startsWith("c")) {
+				cold = true;
 			}
 		}
+		
+		if (args.length > 2) {
+			syncFreq = Integer.parseInt(args[2]);
+		}
+			
+		doTest(count, cold, syncFreq);
+		
+		System.out.println("Actors complete - shutting down");
+		
+		System.out.println("End of Persist testbed");
 
-		aa = new ActorNewAPI[count];
-		ta = new Thread[count];
+	}
+	
+	static boolean doTest (int threadCount, boolean cold, int syncFrequency) {
+		
+		int si, ti, one, two, three;
+		
+		TransactionMgr tMgr = TransactionMgr.getInstance();
+		
+		aa = new ActorNewAPI[threadCount];
+		ta = new Thread[threadCount];
 
 		for (int i = 0; i < 2; ++i) { // do the whole cycle twice...
 
 			try {
-				if (args.length > 1 && args[1].startsWith("c"))
+				if (cold) {
 					tMgr.coldStart();
-				else {
+				} else {
 					tMgr.warmStart();
-					printKeys();
+	//					printKeys();
 				}
 			} catch (PersistException pe) {
-				System.err.println(pe);
-				System.exit(-1);
+				return false;
 			}
 			
-			for (si = 0, ti = count - 1; ti >= 0; --ti) {
+			if (syncFrequency != 0) {
+				tMgr.setSyncFrequency(syncFrequency);
+			}
+			
+			for (si = 0, ti = threadCount - 1; ti >= 0; --ti) {
 
 				one = nextSi(si);
 				two = nextSi(one);
@@ -92,19 +111,17 @@ public class PstTestBedNewAPI {
 
 			// wait for the threads to finish...
 
-			for (ti = count - 1; ti >= 0; --ti) {
+			for (ti = threadCount - 1; ti >= 0; --ti) {
 
 				try {
 					ta[ti].join();
 				} catch (InterruptedException e) {
 				}
 			}
-
-			System.out.println("Actors complete - shutting down");
+			
 			tMgr.shutDown();
 		}
-		System.out.println("End of Persist testbed");
-
+		return true;
 	}
 
 	private static int nextSi(int si) {
