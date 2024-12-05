@@ -34,4 +34,5 @@ jobs:
 
       # Run Maven package build
       - name: Build with Maven
+        working-directory: Persist # Navigate to the subdirectory
         run: mvn clean package
