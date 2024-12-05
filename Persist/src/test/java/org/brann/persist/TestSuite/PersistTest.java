@@ -17,14 +17,11 @@ public class PersistTest {
 	public void testPersistThreads() {
 
 		for (int count=1;count < 20;++count) {
-			for (boolean cold=true;cold;cold=false) {
-				for (int syncFreq=0;syncFreq<20;syncFreq+=20) {
-				
-					assertTrue (PstTestBedNewAPI.doTest(count, cold, syncFreq));
-				}	
-				
-					
-			}
+			for (int syncFreq=0;syncFreq<21;syncFreq+=20) {
+			
+				assertTrue (PstTestBedNewAPI.doTest(count, true, syncFreq));
+				assertTrue (PstTestBedNewAPI.doTest(count, false, syncFreq));
+			}	
 		}
 		
 	}
