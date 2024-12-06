@@ -268,11 +268,13 @@ class TransactionLog {
 				logFileFD.sync();
 
 				try {
-					if (rcmdRoll == false && logFile.length() > TransactionMgr.MAX_FILESIZE) {
+					long len = logFile.length();
+					if (rcmdRoll == false && len > TransactionMgr.MAX_FILESIZE) {
 						rcmdRoll = true;
 					}
 				} catch (IOException ioe) {
-					/* ?? don't care ?? */}
+					System.out.println(ioe.getMessage());
+				/* ?? don't care ?? */}
 			}
 		} catch (Exception e) {
 			System.err.println("Failure to log End of Transaction " + commit + tx + e);

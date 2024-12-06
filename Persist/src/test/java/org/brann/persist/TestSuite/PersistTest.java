@@ -70,4 +70,17 @@ public class PersistTest {
 
 
 	}
+	
+	@Test
+	public void testVolume() {
+		
+		try {
+			VolumeTesterNewAPI v = new VolumeTesterNewAPI(100, 1, false);
+			assertTrue(v.doTest());
+		} catch (PersistException pe) {
+			fail(pe.getMessage());
+		}
+	}
+	
+
 }
