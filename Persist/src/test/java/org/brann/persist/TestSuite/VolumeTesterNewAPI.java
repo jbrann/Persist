@@ -86,7 +86,7 @@ public class VolumeTesterNewAPI {
         handle = TransactionHandle.getTransactionHandle();
     }
     
-    void doTest() {
+    boolean doTest() {
         
         long b4;
         
@@ -103,11 +103,11 @@ public class VolumeTesterNewAPI {
 
              try {
                  handle.commit();
-                 System.out.println (iterations);
+//                 System.out.println (iterations);
                  times[iterations] = System.currentTimeMillis()-b4;
              } catch (PersistException pe) {
                 System.out.println ("FAILED on " + its + ": " + pe);
-                System.exit(-1);
+                return false;
              }
             
              times[iterations] = System.currentTimeMillis()-b4;
@@ -137,6 +137,7 @@ public class VolumeTesterNewAPI {
         TransactionMgr.getInstance().shutDown();
         System.out.println ("\n\n\nShutDown time:" + (System.currentTimeMillis()-b4));
         
+        return true;
     }
     
     /**
